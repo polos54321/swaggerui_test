@@ -1,0 +1,686 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is an application to help store owners/managers to better manage the operations of the store which may include users, products and sales records",
+    "version": "1.0.0",
+    "title": "Polos Store Manager",
+    "contact": {
+      "email": "engineerbpk@gmail.com"
+    }
+  },
+  "host": "polos-store-manager.herokuapp.com",
+  "basePath": "/api/v1",
+  "tags": [
+    {
+      "name": "products",
+      "description": "Operations about products inventory"
+    },
+    {
+      "name": "sales",
+      "description": "Create and review sale order records"
+    },
+    {
+      "name": "user",
+      "description": "Operations about user"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Create user",
+        "description": "Add user details to database. First user to be added automatically becomes admin. subsquent users will not have admin priviledge unless upgraded by admin",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User details to be added to database",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userSignup"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/loginSuccess"
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Logs user into the system",
+        "description": "Check and verify login credentials and supply access token to logged in user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Username and password for login",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userLogin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/loginSuccess"
+            }
+          },
+          "400": {
+            "description": "Invalid username/password supplied"
+          }
+        }
+      }
+    },
+    "/auth/users": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "list of all users",
+        "description": "Lets admin get a list of all the signed up users",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/user"
+            }
+          }
+        }
+      }
+    },
+    "/auth/users/upgrade/{username}": {
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "summary": "upgrade user by username",
+        "description": "Upgrade user to give them admin priviledges",
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "The username of user to upgrade. ",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/auth/users/downgrade/{username}": {
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "summary": "downgrade user by username",
+        "description": "downgrade user to remove admin priviledges",
+        "produces": [
+          "application/xml",
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "The username of user to downgrade. ",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/products/create": {
+      "post": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Add a product to inventory",
+        "description": "Create a new product record in the inventory list",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "details of product to be added",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/addProduct"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/product"
+            }
+          },
+          "400": {
+            "description": "wrong details entered"
+          },
+          "401": {
+            "description": "unauthorised!"
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Get all products in inventory",
+        "description": "Get details of all products in inventory",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/productDetails"
+            }
+          }
+        }
+      }
+    },
+    "/products/{productId}": {
+      "get": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Find product by ID",
+        "description": "Get details of product in inventory by supplying the product ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID of product that needs to be fetched",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/productDetails"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "product not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Delete product by ID",
+        "description": "delete the product whose ID is entered",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID of the product that needs to be deleted",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "product not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "products"
+        ],
+        "summary": "Edit product by ID",
+        "description": "Choose product in inventory by supplying the ID and edit its details",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "description": "ID of product that needs to be edited",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "field to edit and new value",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/editProduct"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/productDetails"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "product not found"
+          }
+        }
+      }
+    },
+    "/sales/create_record": {
+      "post": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Create a sales record",
+        "description": "Create a sales record of the products sold",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "details of sale",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/sale"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/saleRecord"
+            }
+          },
+          "400": {
+            "description": "wrong details entered"
+          },
+          "401": {
+            "description": "unauthorised!"
+          }
+        }
+      }
+    },
+    "/admin/sales/all": {
+      "get": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Get all sales records",
+        "description": "Get details of all sales from all users",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/salesRecords"
+            }
+          }
+        }
+      }
+    },
+    "/sales/{saleId}": {
+      "get": {
+        "tags": [
+          "sales"
+        ],
+        "summary": "Find sale record by ID",
+        "description": "Get details of particular sale record by supplying the ID",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "saleId",
+            "in": "path",
+            "description": "ID of sale that needs to be fetched",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/salesRecords"
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "record not found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "user": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "users_id": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "userSignup": {
+      "type": "object",
+      "properties": {
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "loginSuccess": {
+      "type": "object",
+      "properties": {
+        "Response": {
+          "type": "string"
+        },
+        "access_token": {
+          "type": "string"
+        }
+      }
+    },
+    "userLogin": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "addProduct": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "unit_price": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "minimum_quantity": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "product": {
+      "type": "object",
+      "properties": {
+        "product_added": {
+          "type": "object",
+          "properties": {
+            "initial_quantity": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "minimum_quantity": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "product_name": {
+              "type": "string"
+            },
+            "unit_price": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      }
+    },
+    "productDetails": {
+      "type": "object",
+      "properties": {
+        "found_product": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string"
+            },
+            "minimum_quantity": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "product_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "product_name": {
+              "type": "string"
+            },
+            "quantity": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "unit": {
+              "type": "string"
+            },
+            "unit_price": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      }
+    },
+    "editProduct": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "sale": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "saleRecord": {
+      "type": "object",
+      "properties": {
+        "created_record": {
+          "type": "object",
+          "properties": {
+            "product_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "quantity": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "total_price": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      }
+    },
+    "salesRecords": {
+      "type": "object",
+      "properties": {
+        "sales_records": {
+          "type": "object",
+          "properties": {
+            "attendant_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "product_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "product_name": {
+              "type": "string"
+            },
+            "quantity": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "sale_id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "total_price": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "unit_price": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        }
+      }
+    }
+  }
+}
