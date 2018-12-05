@@ -308,7 +308,7 @@
         justify-content: center; 
     }
     .menu-item-div{
-        width:40%;
+        width:43%;
         text-align: center;
         border-radius:10px;
         border-style: solid;  
@@ -316,7 +316,7 @@
         border-width: 1px;  
     }    
     .current-menu-item-div{
-        width:44%;
+        width:43%;
         text-align: center;
         border-radius:10px;
         border-style: solid;  
